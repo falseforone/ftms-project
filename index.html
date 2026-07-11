@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTMS - Fullstack Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold text-blue-500 mb-8">Hệ Thống FTMS - Bảng Giao Dịch Thực Tế (Full-stack)</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-gray-800 p-6 rounded-lg h-fit">
+                <h2 class="text-xl font-semibold mb-4 text-green-400">Tạo giao dịch mới</h2>
+                <form action="/api/transactions" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400">Người gửi:</label>
+                        <input type="text" name="sender" value="Bùi Huy Nam An" class="w-full p-2 rounded bg-gray-700 mt-1 border border-gray-600" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400">Người nhận:</label>
+                        <input type="text" name="receiver" required class="w-full p-2 rounded bg-gray-700 mt-1 border border-gray-600">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400">Số tiền (VNĐ):</label>
+                        <input type="number" name="amount" placeholder="Nhập trên 10 triệu để thử AI test" required class="w-full p-2 rounded bg-gray-700 mt-1 border border-gray-600">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold transition">Xác thực & Chuyển tiền</button>
+                </form>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-blue-400">Nhật ký giao dịch hệ thống</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-700 text-gray-400">
+                                <th class="p-2">Người nhận</th>
+                                <th class="p-2">Số tiền</th>
+                                <th class="p-2">Trạng thái (AI)</th>
+                                <th class="p-2">Blockchain Hash</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchTransactions() {
+            const response = await fetch('/api/transactions');
+            const data = await response.json();
+            const tableBody = document.getElementById('logTable');
+            
+            tableBody.innerHTML = data.map(tx => `
+                <tr class="border-b border-gray-700 hover:bg-gray-750">
+                    <td class="p-2 font-medium">${tx.receiver}</td>
+                    <td class="p-2">${tx.amount.toLocaleString()} đ</td>
+                    <td class="p-2">
+                        <span class="px-2 py-1 rounded text-xs ${tx.status.includes('Nghi vấn') ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300'}">
+                            ${tx.status}
+                        </span>
+                    </td>
+                    <td class="p-2 text-gray-400 font-mono text-xs">${tx.hash}</td>
+                </tr>
+            `).join('');
+        }
+        fetchTransactions();
+    </script>
+</body>
+</html>
