@@ -3,72 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTMS - Fullstack Demo</title>
+    <title>FTMS - Hệ Thống Quản Lý Giao Dịch Tài Chính</title>
+    <!-- Tailwind CSS & Google Fonts -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js để vẽ biểu đồ Real-time -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white font-sans p-8">
+<body class="bg-gray-950 text-gray-100 flex h-screen overflow-hidden">
 
-    <div class="max-w-5xl mx-auto">
-        <h1 class="text-3xl font-bold text-blue-500 mb-8">Hệ Thống FTMS - Bảng Giao Dịch Thực Tế (Full-stack)</h1>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-gray-800 p-6 rounded-lg h-fit">
-                <h2 class="text-xl font-semibold mb-4 text-green-400">Tạo giao dịch mới</h2>
-                <form action="/api/transactions" method="POST" class="space-y-4">
-                    <div>
-                        <label class="block text-sm text-gray-400">Người gửi:</label>
-                        <input type="text" name="sender" value="Bùi Huy Nam An" class="w-full p-2 rounded bg-gray-700 mt-1 border border-gray-600" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400">Người nhận:</label>
-                        <input type="text" name="receiver" required class="w-full p-2 rounded bg-gray-700 mt-1 border border-gray-600">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400">Số tiền (VNĐ):</label>
-                        <input type="number" name="amount" placeholder="Nhập trên 10 triệu để thử AI test" required class="w-full p-2 rounded bg-gray-700 mt-1 border border-gray-600">
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold transition">Xác thực & Chuyển tiền</button>
-                </form>
+    <!-- SIDEBAR: Thanh menu bên trái -->
+    <div class="w-64 bg-gray-900 border-r border-gray-800 p-6 flex flex-col justify-between flex-shrink-0">
+        <div>
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-lg">F</div>
+                <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">FTMS v1.0</span>
             </div>
-
-            <div class="bg-gray-800 p-6 rounded-lg md:col-span-2">
-                <h2 class="text-xl font-semibold mb-4 text-blue-400">Nhật ký giao dịch hệ thống</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-700 text-gray-400">
-                                <th class="p-2">Người nhận</th>
-                                <th class="p-2">Số tiền</th>
-                                <th class="p-2">Trạng thái (AI)</th>
-                                <th class="p-2">Blockchain Hash</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logTable"></tbody>
-                    </table>
-                </div>
+            <nav class="space-y-2">
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 bg-gray-800 text-blue-400 rounded-xl font-medium transition">
+                    <span>📊 Tổng quan (Real-time)</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-850 hover:text-gray-200 rounded-xl transition">
+                    <span>💸 Quản lý Giao dịch</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-850 hover:text-gray-200 rounded-xl transition">
+                    <span>🛡️ Giám sát AI & AML</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-850 hover:text-gray-200 rounded-xl transition">
+                    <span>🔗 Chuỗi khối Blockchain</span>
+                </a>
+            </nav>
+        </div>
+        <div class="border-t border-gray-800 pt-4 flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-sm font-bold border border-indigo-500 text-indigo-300">U</div>
+            <div>
+                <p class="text-xs text-gray-400">Đăng nhập với tư cách</p>
+                <p class="text-sm font-semibold text-gray-200">Thành viên nhóm 3</p>
             </div>
         </div>
     </div>
 
+    <!-- MAIN CONTENT: Nội dung chính bên phải -->
+    <div class="flex-1 flex flex-col overflow-hidden bg-gray-950">
+        
+        <!-- TOPBAR: Thanh tiêu đề trên cùng -->
+        <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-gray-900/50 backdrop-blur">
+            <h1 class="text-lg font-semibold text-gray-200">Trung Tâm Điều Hành Giao Dịch Tài Chính</h1>
+            <div class="flex items-center space-x-4">
+                <span class="flex items-center text-xs bg-green-950 text-green-400 border border-green-800 px-3 py-1 rounded-full font-medium">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2"></span> Máy chủ: Ổn định
+                </span>
+            </div>
+        </header>
+
+        <!-- CONTAINER CUỘN NỘI DUNG -->
+        <main class="flex-1 overflow-y-auto p-8 space-y-8">
+            
+            <!-- THẺ THÔNG SỐ (WIDGETS) MÔ PHỎNG HỆ THỐNG CAO CẤP -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wider">Tổng số dư hệ thống</p>
+                    <p class="text-2xl font-bold mt-2 text-white">45,820,000,000 đ</p>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wider">Độ trễ xử lý (Real-time)</p>
+                    <p class="text-2xl font-bold mt-2 text-indigo-400">14 ms <span class="text-xs text-gray-500 font-normal">/ giao dịch</span></p>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl border-l-4 border-l-red-500">
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wider">Cảnh báo rủi ro AI (AML)</p>
+                    <p class="text-2xl font-bold mt-2 text-red-400 animate-pulse" id="alertCount">0 hệ thống</p>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wider">Trạng thái Blockchain</p>
+                    <p class="text-2xl font-bold mt-2 text-green-400 text-sm font-mono truncate">Khối #8,204 đính kèm</p>
+                </div>
+            </div>
+
+            <!-- HÀNG BIỂU ĐỒ VÀ FORM TẠO GIAO DỊCH -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- BIỂU ĐỒ REAL-TIME -->
+                <div class="lg:col-span-2 bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-200">Tần suất giao dịch hệ thống (TPS)</h3>
+                        <span class="text-xs text-gray-400">Cập nhật mỗi giây</span>
+                    </div>
+                    <div class="h-64 flex items-center justify-center">
+                        <canvas id="tpsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- FORM CHUYỂN TIỀN -->
+                <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
+                    <h3 class="font-semibold text-gray-200 mb-6 text-green-400">Tạo lệnh chuyển tiền mới</h3>
+                    <form action="/api/transactions" method="POST" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase">Tài khoản nguồn</label>
+                            <input type="text" name="sender" value="BUI HUY NAM AN (Admin)" class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-gray-300 text-sm focus:outline-none focus:border-blue-500" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase">Tài khoản đích</label>
+                            <input type="text" name="receiver" placeholder="Nhập tên người nhận..." required class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase">Số tiền giao dịch (VNĐ)</label>
+                            <input type="number" name="amount" placeholder="Nhập > 10,000,000 để kích hoạt AI" required class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl font-bold text-sm transition shadow-lg shadow-blue-900/20">
+                            Ký số & Phát hành giao dịch
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- BẢNG LỊCH SỬ GIAO DỊCH CHI TIẾT -->
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+                <div class="p-6 border-b border-gray-800 flex items-center justify-between">
+                    <h3 class="font-semibold text-gray-200">Nhật ký giao dịch phân tán toàn hệ thống</h3>
+                    <span class="text-xs text-indigo-400 font-mono">Dữ liệu kết hợp SQL & NoSQL</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-950 text-gray-400 text-xs font-semibold uppercase">
+                            <tr>
+                                <th class="p-4">Người nhận</th>
+                                <th class="p-4">Số tiền xử lý</th>
+                                <th class="p-4">Phân tích rủi ro (AI)</th>
+                                <th class="p-4">Mã chuỗi khối (Blockchain Hash)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTable" class="divide-y divide-gray-800">
+                            <!-- Code JS tự chèn dữ liệu vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT ĐIỀU KHIỂN LOGIC HIỂN THỊ -->
     <script>
+        // Gọi dữ liệu từ Server Backend Node.js lên giao diện
         async function fetchTransactions() {
             const response = await fetch('/api/transactions');
             const data = await response.json();
             const tableBody = document.getElementById('logTable');
             
+            // Đếm số ca nghi vấn để hiển thị lên thẻ cảnh báo của AI
+            const fraudCount = data.filter(tx => tx.status.includes('Nghi vấn')).length;
+            document.getElementById('alertCount').innerText = `${fraudCount} trường hợp`;
+
             tableBody.innerHTML = data.map(tx => `
-                <tr class="border-b border-gray-700 hover:bg-gray-750">
-                    <td class="p-2 font-medium">${tx.receiver}</td>
-                    <td class="p-2">${tx.amount.toLocaleString()} đ</td>
-                    <td class="p-2">
-                        <span class="px-2 py-1 rounded text-xs ${tx.status.includes('Nghi vấn') ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300'}">
+                <tr class="hover:bg-gray-850/50 transition">
+                    <td class="p-4 font-semibold text-gray-200">${tx.receiver}</td>
+                    <td class="p-4 text-gray-300 font-medium">${tx.amount.toLocaleString()} đ</td>
+                    <td class="p-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${tx.status.includes('Nghi vấn') ? 'bg-red-950 text-red-400 border border-red-900' : 'bg-green-950 text-green-400 border border-green-900'}">
+                            <span class="w-1.5 h-1.5 rounded-full mr-1.5 ${tx.status.includes('Nghi vấn') ? 'bg-red-400' : 'bg-green-400'}"></span>
                             ${tx.status}
                         </span>
                     </td>
-                    <td class="p-2 text-gray-400 font-mono text-xs">${tx.hash}</td>
+                    <td class="p-4 text-gray-500 font-mono text-xs select-all hover:text-indigo-400 transition cursor-pointer">${tx.hash}</td>
                 </tr>
             `).join('');
         }
+
+        // Vẽ biểu đồ mô phỏng tần suất giao dịch thời gian thực (Real-time)
+        const ctx = document.getElementById('tpsChart').getContext('2d');
+        const tpsChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['60s trước', '50s trước', '40s trước', '30s trước', '20s trước', 'Vừa xong'],
+                datasets: [{
+                    label: 'Giao dịch / giây',
+                    data: [142, 198, 285, 210, 340, 485],
+                    borderColor: '#3b82f6',
+                    borderWidth: 3,
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#6b7280' } },
+                    y: { grid: { color: '#1f2937' }, ticks: { color: '#6b7280' } }
+                }
+            }
+        });
+
+        // Chạy hàm lấy dữ liệu ngay khi load trang
         fetchTransactions();
     </script>
 </body>
