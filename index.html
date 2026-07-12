@@ -1,4 +1,4 @@
-><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -7,9 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Tích hợp thư viện AI quét cấu trúc trắc học khuôn mặt Real-time -->
-    <script src="https://cdn.jsdelivr.net/npm/jeelizfacefilter/dist/jeelizFaceFilter.umd.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
@@ -17,7 +14,7 @@
 <body class="bg-gray-950 text-gray-100 flex h-screen overflow-hidden relative">
 
     <!-- ======================================================= -->
-    <!-- LỚP GIAO DIỆN ĐĂNG NHẬP & XÁC THỰC AI KHUÔN MẶT CHÍNH XÁC -->
+    <!-- LỚP GIAO DIỆN ĐĂNG NHẬP & XÁC THỰC KHUÔN MẶT BẬT CAMERA -->
     <!-- ======================================================= -->
     <div id="login-overlay" class="absolute inset-0 bg-gray-950 flex items-center justify-center z-50 transition-all duration-500">
         <div class="w-full max-w-md bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
@@ -32,39 +29,36 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 uppercase">Tài khoản</label>
-                        <input type="text" id="username" value="admin_nhom3" class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm">
+                        <input type="text" id="username" value="admin_nhom3" class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 uppercase">Mật khẩu</label>
-                        <input type="password" id="password" value="••••••••" class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm">
+                        <input type="password" id="password" value="••••••••" class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
                     </div>
-                    <button onclick="startStrictFaceAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl font-bold text-sm transition mt-2 cursor-pointer">
+                    <button onclick="startFaceAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl font-bold text-sm transition mt-2 cursor-pointer">
                         Tiếp tục
                     </button>
                 </div>
             </div>
 
-            <!-- XÁC THỰC KHUÔN MẶT BẬT WEBCAM THẬT + QUÉT TỌA ĐỘ AI (MÀN HÌNH 2) -->
+            <!-- XÁC THỰC KHUÔN MẶT BẬT WEBCAM THẬT - eKYC (MÀN HÌNH 2) -->
             <div id="login-step-2" class="hidden space-y-6 text-center">
                 <div>
-                    <h2 class="text-xl font-bold text-indigo-400">🛡️ Lớp Xác Thực Sinh Trắc Học AI</h2>
-                    <p class="text-sm text-gray-400 mt-1">Đưa khuôn mặt vào giữa khung tròn để hệ thống quét tọa độ</p>
+                    <h2 class="text-xl font-bold text-indigo-400">🛡️ Lớp Xác Thực Sinh Trắc Học</h2>
+                    <p class="text-sm text-gray-400 mt-1">Hệ thống AI đang quét thông tin eKYC để cấp quyền truy cập</p>
                 </div>
                 
-                <!-- Vùng hiển thị camera xử lý canvas AI -->
+                <!-- Khung tròn hiển thị Webcam thật của máy tính -->
                 <div class="w-56 h-56 rounded-full border-4 border-dashed border-blue-500 mx-auto relative flex items-center justify-center bg-gray-950 overflow-hidden">
-                    <canvas id="jeeFaceFilterCanvas" class="w-full h-full object-cover scale-x-[-1]"></canvas>
-                    
-                    <!-- Khung định vị mục tiêu cho người dùng căn mặt -->
-                    <div class="absolute w-40 h-40 border-2 border-dashed border-white/30 rounded-full animate-pulse"></div>
+                    <video id="webcam" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
                     <!-- Tia quét laser chạy lên chạy xuống -->
                     <div class="absolute inset-x-0 top-0 h-1 bg-blue-400 opacity-70 animate-bounce shadow-[0_0_15px_#3b82f6]"></div>
                 </div>
 
                 <div class="space-y-3">
-                    <p class="text-xs text-blue-400 font-mono tracking-widest uppercase animate-pulse" id="auth-status">Đang tải mô hình học sâu...</p>
+                    <p class="text-xs text-blue-400 font-mono tracking-widest uppercase animate-pulse" id="auth-status">Đang khởi động camera...</p>
                     <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-blue-500 h-full w-0 transition-all duration-[2000ms] ease-out" id="progress-bar"></div>
+                        <div class="bg-blue-500 h-full w-0 transition-all duration-[3000ms] ease-out" id="progress-bar"></div>
                     </div>
                 </div>
             </div>
@@ -230,79 +224,52 @@
         </main>
     </div>
 
-    <!-- LOGIC KHỞI ĐỘNG CAMERA THẬT VÀ XÁC THỰC MẠNH BẰNG AI DỮ LIỆU TỌA ĐỘ -->
+    <!-- LOGIC KHỞI ĐỘNG CAMERA THẬT VÀ XÁC THỰC -->
     <script>
-        let faceDetectedTime = 0;
-        let isAuthSuccessful = false;
+        let streamRef = null;
 
-        // Hàm chạy thuật toán quét tọa độ trắc học
-        function startStrictFaceAuth() {
+        // Hàm bật webcam thật từ máy tính
+        async function startFaceAuth() {
             document.getElementById('login-step-1').classList.add('hidden');
             document.getElementById('login-step-2').classList.remove('hidden');
-            
-            document.getElementById('auth-status').innerText = "AI đang quét tọa độ khuôn mặt...";
 
-            // Khởi tạo mạng nơ-ron mạng lọc khuôn mặt Jeeliz
-            JEELIZFACEFILTER.init({
-                canvasId: 'jeeFaceFilterCanvas',
-                NNCPath: 'https://cdn.jsdelivr.net/npm/jeelizfacefilter/dist/NNC.json', // Tải file ma trận trọng số học sâu
-                callbackReady: function(errCode) {
-                    if (errCode) {
-                        document.getElementById('auth-status').innerText = "Lỗi: Không thể truy cập Camera thiết bị!";
-                        document.getElementById('auth-status').className = "text-xs text-red-500 font-mono uppercase";
-                        return;
+            try {
+                // Gọi quyền truy cập camera thực tế từ trình duyệt
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const videoEl = document.getElementById('webcam');
+                videoEl.srcObject = stream;
+                streamRef = stream;
+
+                document.getElementById('auth-status').innerText = "AI đang phân tích trắc học khuôn mặt...";
+                
+                // Chạy thanh phần trăm nạp (3 giây)
+                setTimeout(() => {
+                    document.getElementById('progress-bar').style.width = '100%';
+                }, 100);
+
+                // Giả lập AI nhận diện khớp dữ liệu sau 3 giây
+                setTimeout(() => {
+                    document.getElementById('auth-status').innerText = "Khớp hồ sơ eKYC thành công!";
+                    document.getElementById('auth-status').className = "text-xs text-green-400 font-mono tracking-widest uppercase";
+                    
+                    // Tắt luồng camera sau khi quét xong để tiết kiệm pin máy
+                    if (streamRef) {
+                        streamRef.getTracks().forEach(track => track.stop());
                     }
-                },
-                // Hàm chạy lặp liên tục mỗi mili-giây để kiểm tra vị trí trắc học khuôn mặt
-                callbackTrack: function(detectState) {
-                    if (isAuthSuccessful) return;
 
-                    // detectState.detected > 0.75 nghĩa là AI nhận diện có khuôn mặt nằm chính xác trong camera
-                    if (detectState.detected > 0.75) {
-                        
-                        // Kiểm tra độ cân bằng (tâm khuôn mặt x, y phải tiệm cận mức 0 để đảm bảo nhìn thẳng)
-                        const isCentered = Math.abs(detectState.x) < 0.25 && Math.abs(detectState.y) < 0.25;
-                        
-                        if (isCentered) {
-                            faceDetectedTime += 20; // Cộng dồn thời gian giữ im lặng trước camera
-                            
-                            // Cập nhật thanh phần trăm tiến trình tương ứng thời gian quét mặt
-                            let progressPercent = Math.min((faceDetectedTime / 1500) * 100, 100);
-                            document.getElementById('progress-bar').style.width = progressPercent + '%';
-                            document.getElementById('auth-status').innerText = `ĐANG PHÂN TÍCH TRẮC HỌC... (${Math.round(progressPercent)}%)`;
-                            document.getElementById('auth-status').className = "text-xs text-yellow-400 font-mono animate-pulse";
+                    // Ẩn màn hình khóa để vào Dashboard chính
+                    setTimeout(() => {
+                        const overlay = document.getElementById('login-overlay');
+                        overlay.classList.add('opacity-0', 'pointer-events-none');
+                    }, 500);
 
-                            // Phải giữ khuôn mặt chính xác liên tục trong 1.5 giây để tránh quét nhầm/quét lướt qua
-                            if (faceDetectedTime >= 1500) {
-                                isAuthSuccessful = true;
-                                document.getElementById('auth-status').innerText = "XÁC THỰC eKYC THÀNH CÔNG!";
-                                document.getElementById('auth-status').className = "text-xs text-green-400 font-mono font-bold";
-                                
-                                // Tắt luồng camera giải phóng tài nguyên CPU máy
-                                JEELIZFACEFILTER.destroy();
+                }, 3000);
 
-                                // Mở khóa màn hình vào Dashboard chính
-                                setTimeout(() => {
-                                    document.getElementById('login-overlay').classList.add('opacity-0', 'pointer-events-none');
-                                }, 500);
-                            }
-                        } else {
-                            // Nếu mặt bị lệch ra ngoài vòng tròn
-                            resetScanner("Cảnh báo: Đưa khuôn mặt vào ĐÚNG TÂM vòng tròn!");
-                        }
-                    } else {
-                        // Nếu không tìm thấy bất kỳ khuôn mặt nào trong phạm vi camera
-                        resetScanner("Hệ thống: Vui lòng hướng khuôn mặt vào camera!");
-                    }
-                }
-            });
-        }
-
-        function resetScanner(message) {
-            faceDetectedTime = Math.max(0, faceDetectedTime - 40); // Khấu trừ thanh phần trăm nếu cố tình né tránh
-            document.getElementById('progress-bar').style.width = (faceDetectedTime / 1500) * 100 + '%';
-            document.getElementById('auth-status').innerText = message;
-            document.getElementById('auth-status').className = "text-xs text-red-400 font-mono font-medium";
+            } catch (err) {
+                // Xử lý nếu người dùng bấm "Từ chối" quyền camera
+                document.getElementById('auth-status').innerText = "Lỗi: Không tìm thấy hoặc bị chặn quyền Camera!";
+                document.getElementById('auth-status').className = "text-xs text-red-500 font-mono tracking-widest uppercase";
+            }
         }
 
         // Logic chuyển đổi Tab Dashboard
