@@ -13,13 +13,11 @@
 </head>
 <body class="bg-gray-950 text-gray-100 flex h-screen overflow-hidden relative">
 
-    <!-- ======================================================= -->
-    <!-- LỚP GIAO DIỆN ĐĂNG NHẬP & XÁC THỰC KHUÔN MẶT BẬT CAMERA -->
-    <!-- ======================================================= -->
+    <!-- LỚP GIAO DIỆN ĐĂNG NHẬP (ĐÃ ĐỂ TRỐNG THÔNG TIN) -->
     <div id="login-overlay" class="absolute inset-0 bg-gray-950 flex items-center justify-center z-50 transition-all duration-500">
         <div class="w-full max-w-md bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
             
-            <!-- FORM ĐĂNG NHẬP (MÀN HÌNH 1) -->
+            <!-- FORM ĐĂNG NHẬP -->
             <div id="login-step-1" class="space-y-6">
                 <div class="text-center">
                     <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-xl mx-auto mb-3">F</div>
@@ -29,11 +27,13 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 uppercase">Tài khoản</label>
-                        <input type="text" id="username" value="admin_nhom3" class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
+                        <!-- Đã để trống dữ liệu đầu vào -->
+                        <input type="text" id="username" placeholder="Nhập tài khoản..." class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 uppercase">Mật khẩu</label>
-                        <input type="password" id="password" value="••••••••" class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
+                        <!-- Đã để trống dữ liệu đầu vào -->
+                        <input type="password" id="password" placeholder="Nhập mật khẩu..." class="w-full p-3 rounded-xl bg-gray-950 mt-1 border border-gray-800 text-white text-sm focus:outline-none focus:border-blue-500">
                     </div>
                     <button onclick="startFaceAuth()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl font-bold text-sm transition mt-2 cursor-pointer">
                         Tiếp tục
@@ -41,20 +41,16 @@
                 </div>
             </div>
 
-            <!-- XÁC THỰC KHUÔN MẶT BẬT WEBCAM THẬT - eKYC (MÀN HÌNH 2) -->
+            <!-- XÁC THỰC KHUÔN MẶT BẬT WEBCAM THẬT -->
             <div id="login-step-2" class="hidden space-y-6 text-center">
                 <div>
                     <h2 class="text-xl font-bold text-indigo-400">🛡️ Lớp Xác Thực Sinh Trắc Học</h2>
                     <p class="text-sm text-gray-400 mt-1">Hệ thống AI đang quét thông tin eKYC để cấp quyền truy cập</p>
                 </div>
-                
-                <!-- Khung tròn hiển thị Webcam thật của máy tính -->
                 <div class="w-56 h-56 rounded-full border-4 border-dashed border-blue-500 mx-auto relative flex items-center justify-center bg-gray-950 overflow-hidden">
                     <video id="webcam" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
-                    <!-- Tia quét laser chạy lên chạy xuống -->
                     <div class="absolute inset-x-0 top-0 h-1 bg-blue-400 opacity-70 animate-bounce shadow-[0_0_15px_#3b82f6]"></div>
                 </div>
-
                 <div class="space-y-3">
                     <p class="text-xs text-blue-400 font-mono tracking-widest uppercase animate-pulse" id="auth-status">Đang khởi động camera...</p>
                     <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
@@ -66,10 +62,7 @@
         </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- GIAO DIỆN CHÍNH DASHBOARD (ẨN DƯỚI LỚP LOGIN) -->
-    <!-- ======================================================= -->
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR MENU -->
     <div class="w-64 bg-gray-900 border-r border-gray-800 p-6 flex flex-col justify-between flex-shrink-0">
         <div>
             <div class="flex items-center space-x-3 mb-8">
@@ -132,8 +125,12 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- BIỂU ĐỒ REAL-TIME CHUYỂN ĐỘNG -->
                     <div class="lg:col-span-2 bg-gray-900 border border-gray-800 p-6 rounded-2xl h-80 flex flex-col justify-between">
-                        <h3 class="font-semibold text-gray-200">Tần suất giao dịch hệ thống (TPS)</h3>
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-200">Tần suất giao dịch liên tục (TPS)</h3>
+                            <span class="text-xs text-blue-400 animate-pulse">● Đang quét trực tuyến</span>
+                        </div>
                         <div class="flex-1 relative mt-4"><canvas id="tpsChart"></canvas></div>
                     </div>
 
@@ -157,7 +154,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: QUẢN LÝ -->
+            <!-- TAB 2, 3, 4 GIỮ NGUYÊN -->
             <div id="tab-quan-ly" class="tab-content hidden space-y-6">
                 <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
                     <h3 class="font-semibold text-gray-200 mb-4 text-blue-400">Bộ lọc & Tra cứu dữ liệu</h3>
@@ -173,7 +170,6 @@
                 </div>
             </div>
 
-            <!-- TAB 3: GIÁM SÁT AI -->
             <div id="tab-giam-sat" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl border-t-4 border-t-red-500">
@@ -187,7 +183,6 @@
                 </div>
             </div>
 
-            <!-- TAB 4: BLOCKCHAIN -->
             <div id="tab-blockchain" class="tab-content hidden space-y-6">
                 <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl font-mono text-sm space-y-4">
                     <h3 class="font-semibold text-green-400 font-sans text-base">Cấu hình Sổ cái phi tập trung (Hyperledger Fabric)</h3>
@@ -195,13 +190,10 @@
                         <p class="text-blue-400 font-bold">Node đang kết nối: <span class="text-gray-300">Peer-0.UTH_Logistics.vn</span></p>
                         <p class="text-gray-500 mt-1">Giao thức đồng thuận: Proof of Authority (PoA)</p>
                     </div>
-                    <div class="p-4 bg-gray-950 rounded-xl border border-gray-800">
-                        <p class="text-green-400 font-bold">Hợp đồng thông minh (Smart Contract): <span class="text-gray-300">Active v1.2</span></p>
-                    </div>
                 </div>
             </div>
 
-            <!-- BẢNG NHẬT KÝ CHUNG -->
+            <!-- BẢNG NHẬT KÝ CHI TIẾT NGÀY GIỜ -->
             <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden mt-8">
                 <div class="p-6 border-b border-gray-800 flex items-center justify-between">
                     <h3 class="font-semibold text-gray-200">Nhật ký giao dịch phân tán toàn hệ thống</h3>
@@ -211,6 +203,7 @@
                     <table class="w-full text-left text-sm">
                         <thead class="bg-gray-950 text-gray-400 text-xs font-semibold uppercase">
                             <tr>
+                                <th class="p-4">Thời gian</th>
                                 <th class="p-4">Người nhận</th>
                                 <th class="p-4">Số tiền xử lý</th>
                                 <th class="p-4">Phân tích rủi ro (AI)</th>
@@ -224,55 +217,46 @@
         </main>
     </div>
 
-    <!-- LOGIC KHỞI ĐỘNG CAMERA THẬT VÀ XÁC THỰC -->
+    <!-- HỆ THỐNG LOGIC ĐIỀU KHIỂN -->
     <script>
         let streamRef = null;
 
-        // Hàm bật webcam thật từ máy tính
+        // Bật webcam quét mặt
         async function startFaceAuth() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            
+            if(!user || !pass) {
+                alert("Vui lòng điền đầy đủ Tài khoản và Mật khẩu quản trị viên!");
+                return;
+            }
+
             document.getElementById('login-step-1').classList.add('hidden');
             document.getElementById('login-step-2').classList.remove('hidden');
 
             try {
-                // Gọi quyền truy cập camera thực tế từ trình duyệt
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const videoEl = document.getElementById('webcam');
-                videoEl.srcObject = stream;
+                document.getElementById('webcam').srcObject = stream;
                 streamRef = stream;
 
-                document.getElementById('auth-status').innerText = "AI đang phân tích trắc học khuôn mặt...";
-                
-                // Chạy thanh phần trăm nạp (3 giây)
-                setTimeout(() => {
-                    document.getElementById('progress-bar').style.width = '100%';
-                }, 100);
+                document.getElementById('auth-status').innerText = "AI đang quét trắc học khuôn mặt...";
+                setTimeout(() => { document.getElementById('progress-bar').style.width = '100%'; }, 100);
 
-                // Giả lập AI nhận diện khớp dữ liệu sau 3 giây
                 setTimeout(() => {
                     document.getElementById('auth-status').innerText = "Khớp hồ sơ eKYC thành công!";
                     document.getElementById('auth-status').className = "text-xs text-green-400 font-mono tracking-widest uppercase";
-                    
-                    // Tắt luồng camera sau khi quét xong để tiết kiệm pin máy
-                    if (streamRef) {
-                        streamRef.getTracks().forEach(track => track.stop());
-                    }
+                    if (streamRef) streamRef.getTracks().forEach(track => track.stop());
 
-                    // Ẩn màn hình khóa để vào Dashboard chính
                     setTimeout(() => {
-                        const overlay = document.getElementById('login-overlay');
-                        overlay.classList.add('opacity-0', 'pointer-events-none');
+                        document.getElementById('login-overlay').classList.add('opacity-0', 'pointer-events-none');
                     }, 500);
-
                 }, 3000);
-
             } catch (err) {
-                // Xử lý nếu người dùng bấm "Từ chối" quyền camera
-                document.getElementById('auth-status').innerText = "Lỗi: Không tìm thấy hoặc bị chặn quyền Camera!";
+                document.getElementById('auth-status').innerText = "Lỗi: Hãy cho phép quyền bật Camera!";
                 document.getElementById('auth-status').className = "text-xs text-red-500 font-mono tracking-widest uppercase";
             }
         }
 
-        // Logic chuyển đổi Tab Dashboard
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
@@ -280,19 +264,10 @@
                 btn.classList.remove('bg-gray-800', 'text-blue-400');
                 btn.classList.add('text-gray-400');
             });
-            const activeBtn = document.getElementById('btn-' + tabId);
-            activeBtn.classList.remove('text-gray-400');
-            activeBtn.classList.add('bg-gray-800', 'text-blue-400');
-
-            const titles = {
-                'tong-quan': 'Trung Tâm Điều Hành Giao Dịch Tài Chính',
-                'quan-ly': 'Hệ Thống Kiểm Soát & Tra Cứu Luồng Tiền',
-                'giam-sat': 'Mô-đun Phân Tích Rủi Ro Tự Động Bằng AI',
-                'blockchain': 'Hạ Tầng Mã Hóa Chuỗi Khối (Blockchain Audit Trace)'
-            };
-            document.getElementById('page-title').innerText = titles[tabId];
+            document.getElementById('btn-' + tabId).classList.add('bg-gray-800', 'text-blue-400');
         }
 
+        // Lấy danh sách giao dịch & tự chèn ngày giờ chi tiết
         async function fetchTransactions() {
             const response = await fetch('/api/transactions');
             const data = await response.json();
@@ -301,34 +276,49 @@
             const fraudCount = data.filter(tx => tx.status.includes('Nghi vấn')).length;
             document.getElementById('alertCount').innerText = `${fraudCount} trường hợp`;
 
+            const currentTime = new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN');
+
             tableBody.innerHTML = data.map(tx => `
                 <tr class="hover:bg-gray-850/50 transition">
+                    <td class="p-4 text-gray-400 font-mono text-xs">${currentTime}</td>
                     <td class="p-4 font-semibold text-gray-200">${tx.receiver}</td>
                     <td class="p-4 text-gray-300 font-medium">${tx.amount.toLocaleString()} đ</td>
                     <td class="p-4">
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${tx.status.includes('Nghi vấn') ? 'bg-red-950 text-red-400 border border-red-900' : 'bg-green-950 text-green-400 border border-green-900'}">
-                            <span class="w-1.5 h-1.5 rounded-full mr-1.5 ${tx.status.includes('Nghi vấn') ? 'bg-red-400' : 'bg-green-400'}"></span>
                             ${tx.status}
                         </span>
                     </td>
-                    <td class="p-4 text-gray-500 font-mono text-xs select-all hover:text-indigo-400 transition cursor-pointer">${tx.hash}</td>
+                    <td class="p-4 text-gray-500 font-mono text-xs truncate max-w-[150px]">${tx.hash}</td>
                 </tr>
             `).join('');
         }
 
+        // KHỞI TẠO BIỂU ĐỒ CHUYỂN ĐỘNG THỜI GIAN THỰC (REAL-TIME CHART)
         const ctx = document.getElementById('tpsChart').getContext('2d');
-        new Chart(ctx, {
+        const maxDataPoints = 7;
+        
+        // Tạo nhãn thời gian thực lúc ban đầu
+        const initialLabels = [];
+        const initialData = [];
+        for(let i=maxDataPoints-1; i>=0; i--) {
+            let t = new Date(Date.now() - i*3000);
+            initialLabels.push(t.toLocaleTimeString('vi-VN'));
+            initialData.push(Math.floor(Math.random() * 200) + 150);
+        }
+
+        const tpsChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['60s trước', '50s trước', '40s trước', '30s trước', '20s trước', 'Vừa xong'],
+                labels: initialLabels,
                 datasets: [{
-                    data: [142, 198, 285, 210, 340, 485],
+                    data: initialData,
                     borderColor: '#3b82f6',
                     borderWidth: 3,
-                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.03)',
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 0
+                    pointRadius: 4,
+                    pointBackgroundColor: '#3b82f6'
                 }]
             },
             options: {
@@ -336,11 +326,30 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { display: false }, ticks: { color: '#6b7280' } },
-                    y: { grid: { color: '#1f2937' }, ticks: { color: '#6b7280' } }
+                    x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } },
+                    y: { grid: { color: '#1f2937' }, ticks: { color: '#6b7280' }, min: 100, max: 600 }
                 }
             }
         });
+
+        // HÀM TỰ ĐỘNG CẬP NHẬT BIỂU ĐỒ MỖI 3 GIÂY
+        setInterval(() => {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN');
+            const newTpsValue = Math.floor(Math.random() * 300) + 180; // Nhảy số ngẫu nhiên mô phỏng giao dịch
+
+            // Thêm dữ liệu mới
+            tpsChart.data.labels.push(timeString);
+            tpsChart.data.datasets[0].data.push(newTpsValue);
+
+            // Xóa dữ liệu cũ ở đầu để giữ biểu đồ tịnh tiến về bên phải
+            if(tpsChart.data.labels.length > maxDataPoints) {
+                tpsChart.data.labels.shift();
+                tpsChart.data.datasets[0].data.shift();
+            }
+
+            tpsChart.update();
+        }, 3000);
 
         fetchTransactions();
     </script>
